@@ -1,2 +1,5 @@
-flask==2.3.2
+Flask==2.2.5
 Werkzeug<3.0
+pytest==7.4.4
+pytest-cov==4.1.0
+gunicorn==21.2.0
