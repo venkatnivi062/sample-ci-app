@@ -61,6 +61,6 @@ jobs:
 
           docker run -d \
             --name sample-app \
-            -p 80:8000 \
+            -p 80:5000 \
             --restart unless-stopped \
             ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest
