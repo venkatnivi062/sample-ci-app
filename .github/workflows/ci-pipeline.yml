@@ -1,41 +1,66 @@
-name: CI Pipeline
- 
+name: CI-CD Pipeline
+
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
- 
+
 jobs:
   build-test-docker:
     runs-on: ubuntu-latest
- 
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
- 
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
- 
+
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
         pip install pytest
- 
+
     - name: Run Tests
       run: pytest
- 
+
     - name: Log in to DockerHub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-        logout: true
- 
+
     - name: Build Docker image
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest .
- 
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest .
+
     - name: Push Docker image
-      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest
+      run: |
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest
+
+
+  deploy-to-ec2:
+    needs: build-test-docker
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy on EC2 via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest
+
+          docker stop sample-app || true
+          docker rm sample-app || true
+
+          docker run -d \
+            --name sample-app \
+            -p 80:8000 \
+            --restart unless-stopped \
+            ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest
