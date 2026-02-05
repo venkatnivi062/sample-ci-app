@@ -33,11 +33,11 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest . 
+        docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:${{github.sha }} . 
 
     - name: Push Docker image
       run: |
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:${{github.sha }}
 
 
   deploy-to-ec2:
