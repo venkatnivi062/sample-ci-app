@@ -54,7 +54,7 @@ jobs:
         script: |
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
 
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:${{github.sha }}
 
           docker stop sample-app || true
           docker rm sample-app || true
@@ -63,4 +63,4 @@ jobs:
             --name sample-app \
             -p 80:5000 \
             --restart unless-stopped \
-            ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:${{github.sha }}
