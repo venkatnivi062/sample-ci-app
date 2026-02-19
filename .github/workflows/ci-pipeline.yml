@@ -39,8 +39,8 @@ jobs:
       run: |
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:${{github.sha }}
         # Tag and push latest
-        docker tag $DOCKERHUB_USERNAME/sample-ci-cd-app:${GITHUB_SHA} $DOCKERHUB_USERNAME/sample-ci-cd-app:latest
-        docker push $DOCKERHUB_USERNAME/sample-ci-cd-app:latest
+        docker tag ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/sample-ci-cd-app:latest
 
 
 
